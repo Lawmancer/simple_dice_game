@@ -5,6 +5,12 @@
 *.so
 *.dylib
 
+# editor
+*.idea
+
+# coverage
+coverage.html
+
 # Test binary, build with `go test -c`
 *.test
 
