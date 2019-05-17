@@ -77,7 +77,7 @@ func TestTotalChoicesDoesCorrectMath(t *testing.T) {
 
 func TestReportRollsDoesNotPanic(t *testing.T) {
 	gamer := getPlayer()
-	dice := []int{1,2,4}
+	dice := []int{1, 2, 4}
 	gamer.reportRolls(dice)
 }
 

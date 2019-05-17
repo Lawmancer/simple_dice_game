@@ -22,14 +22,7 @@ func (p *player) takeTurn(numDice int) error {
 	rand.Seed(time.Now().UnixNano()) // seed once per turn
 	diceRemaining := numDice
 	for diceRemaining > 0 {
-		d := diceRemaining
-		var dice []int
-		for d > 0 {
-			rnd := rand.Intn(5) + 1
-			dice = append(dice, rnd)
-			d--
-		}
-
+		dice := p.roll(diceRemaining)
 		chosen, err := p.choose(dice)
 		if err != nil {
 			return errors.New(err.Error())
@@ -44,11 +37,22 @@ func (p *player) takeTurn(numDice int) error {
 	return nil
 }
 
+func (p *player) roll(d int) []int {
+	var dice []int
+	for d > 0 {
+		rnd := rand.Intn(5) + 1
+		dice = append(dice, rnd)
+		d--
+	}
+	return dice
+}
+
 func (p *player) choose(dice []int) (choices []int, err error) {
 	if len(dice) == 0 {
 		err = errors.New("no dice to make choice with")
 		return
 	}
+
 	p.reportRolls(dice)
 	for _, die := range dice {
 		if die == wild || die == 1 || die == 2 {
@@ -57,10 +61,10 @@ func (p *player) choose(dice []int) (choices []int, err error) {
 		}
 	}
 	if len(choices) == 0 {
-		low := 0
-		// first is already lowest, so we start at index 1
-		for i := 1; i < len(choices); i++ {
-			if dice[i] < dice[low] {
+		var low int
+		for i := 0; i < len(choices); i++ {
+			// first iteration is always first low
+			if dice[i] < dice[low] || i == 0 {
 				low = i
 			}
 		}

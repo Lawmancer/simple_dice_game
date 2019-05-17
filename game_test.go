@@ -26,7 +26,7 @@ func TestMainErrWithoutNames(t *testing.T) {
 func TestRandomFirstPlayerReturnsFour(t *testing.T) {
 	expect := 4
 	gamers := getFourGamers()
-	res, err := randomFirstPlayer(gamers)
+	res, err := randomizePlayers(gamers)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -37,7 +37,7 @@ func TestRandomFirstPlayerReturnsFour(t *testing.T) {
 
 func TestRandomFirstPlayerErrWithZeroGamers(t *testing.T) {
 	var gamers []player
-	_, err := randomFirstPlayer(gamers)
+	_, err := randomizePlayers(gamers)
 	if err == nil {
 		t.Errorf("Expected error")
 	} else if err.Error() != "no gamers to sort" {

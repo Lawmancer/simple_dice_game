@@ -8,12 +8,7 @@ import (
 	"time"
 )
 
-const wild = 4
-const wildValue = 0
-const rounds = 4
-const totalDice = 5
-
-func playGame(playerNames []string) (winner player, error error) {
+func playGame(playerNames []string, totalDice int) (winner player, error error) {
 	if len(playerNames) == 0 {
 		error = errors.New("no players to play the game")
 		return
@@ -25,39 +20,38 @@ func playGame(playerNames []string) (winner player, error error) {
 		unsortedGamers = append(unsortedGamers, p)
 	}
 
-	gamers, err := randomFirstPlayer(unsortedGamers)
+	gamers, err := randomizePlayers(unsortedGamers)
+	sortPlayers(gamers)
 	if err != nil {
-		error = errors.New(err.Error())
 		return
 	}
 
 	listPlayers(gamers)
 	roundNum := 0
-	for roundNum < rounds {
+	for roundNum < len(gamers) {
 		roundNum++
 		fmt.Println("\n-----------------------")
 		fmt.Println("Starting Round", roundNum)
 		for i := range gamers {
 			err := gamers[i].takeTurn(totalDice)
 			if err != nil {
-				error = errors.New(err.Error())
 				return
 			}
 		}
 		gamers[0].turnOrder = gamers[0].turnOrder + len(gamers) // move to end of line
 		gamers = sortPlayers(gamers)
 	}
-	gamers = getWinnerFirst(gamers)
-	winner = gamers[0]
-	for _, p := range gamers {
-		fmt.Printf("%s has a final score of %d\n", p.name, p.score)
+
+	winners := getWinners(gamers)
+	error = announceWinners(winners)
+	if error != nil {
+		return
 	}
-	fmt.Printf("\n%s wins with a final score of %d\n", winner.name, winner.score)
 
 	return
 }
 
-func randomFirstPlayer(gamers []player) (sortedGamers []player, err error) {
+func randomizePlayers(gamers []player) (sortedGamers []player, err error) {
 	if len(gamers) == 0 {
 		err = errors.New("no gamers to sort")
 		return
@@ -72,7 +66,7 @@ func randomFirstPlayer(gamers []player) (sortedGamers []player, err error) {
 			next++
 		}
 	}
-	return sortPlayers(gamers), err
+	return gamers, err
 }
 
 func sortPlayers(gamers []player) []player {
@@ -89,10 +83,55 @@ func listPlayers(gamers []player) {
 	fmt.Println()
 }
 
-func getWinnerFirst(gamers []player) []player {
+func getWinners(gamers []player) (winners []player) {
+	// sort by scores
 	sort.Slice(gamers, func(i, j int) bool {
 		return gamers[i].score < gamers[j].score
 	})
 
-	return gamers
+	winningScore := gamers[0].score
+	for _, gamer := range gamers {
+		// first player will always be appended
+		// players with tied scores will also be appended
+		if gamer.score == winningScore {
+			winners = append(winners, gamer)
+		} else {
+			// no more ties
+			break
+		}
+	}
+
+	return winners
+}
+
+// announceWinners with some prettified grammar (uses oxford comma)
+func announceWinners(winners []player) error {
+	numWinners := len(winners)
+	winPlural := ""
+	separator := ","
+	and := ""
+	if numWinners == 0 {
+		err := errors.New("nobody won the game")
+		return err
+	}
+	if numWinners == 1 {
+		winPlural = "s"
+	}
+	if numWinners <= 2 {
+		separator = ""
+	}
+	if numWinners > 1 {
+		and = "and "
+	}
+	last := numWinners - 1
+	for i, winner := range winners {
+		if i != last {
+			fmt.Printf("%s%s ", winner.name, separator)
+		} else {
+			separator = ""
+			fmt.Printf("%s%s%s ", and, winner.name, separator)
+		}
+	}
+	fmt.Printf("win%s with a final score of %d!\n", winPlural, winners[0].score)
+	return nil
 }
