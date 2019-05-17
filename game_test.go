@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// integration test for unexpected errors or panic
 func TestPlayGameReturnsPlayer(t *testing.T) {
 	playerNames := []string{"Freddie Mercury", "Brian May", "Roger Taylor", "John Deacon "}
 	totalDice := 4
@@ -13,7 +14,7 @@ func TestPlayGameReturnsPlayer(t *testing.T) {
 	}
 }
 
-func TestMainErrWithoutNames(t *testing.T) {
+func TestPlayGameErrWithoutNames(t *testing.T) {
 	expect := noPlayersErr
 	totalDice := 6
 	var playerNames []string
@@ -25,11 +26,11 @@ func TestMainErrWithoutNames(t *testing.T) {
 	}
 }
 
-// no real way to test random order, but at least ensure get everyone back
-func TestRandomFirstPlayerReturnsFour(t *testing.T) {
+// no real way to test random order, but at least ensure we get everyone back
+func TestRandomTurnOrderReturnsFour(t *testing.T) {
 	expect := 4
 	gamers := getFourGamers()
-	res, err := randomizePlayers(gamers)
+	res, err := randomTurnOrder(gamers)
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
@@ -38,12 +39,12 @@ func TestRandomFirstPlayerReturnsFour(t *testing.T) {
 	}
 }
 
-func TestRandomFirstPlayerErrWithZeroGamers(t *testing.T) {
+func TestRandomTurnOrderErrWithZeroGamers(t *testing.T) {
 	var gamers []player
-	_, err := randomizePlayers(gamers)
+	_, err := randomTurnOrder(gamers)
 	if err == nil {
 		t.Errorf("Expected error")
-	} else if err.Error() != "no gamers to sort" {
+	} else if err.Error() != noPlayersErr {
 		t.Errorf("Expected error: %v", err)
 	}
 }
@@ -52,7 +53,7 @@ func TestSortPlayersReturnsCorrectOrder(t *testing.T) {
 	expect := 4
 	gamers := getFourGamers()
 	for i := 3; i >= 0; i-- {
-		gamers[i].turnOrder = (i-4)*-1
+		gamers[i].turnOrder = (i - 4) * -1
 	}
 	res := sortPlayers(gamers)
 	if len(res) != expect {
@@ -97,11 +98,6 @@ func TestGetWinnersReturnsTie(t *testing.T) {
 	if winners[1].name != "Roger Taylor" {
 		t.Errorf("Roger Taylor did not tie for win.")
 	}
-}
-
-func TestListPlayersDoesNotPanic(t *testing.T) {
-	gamers := getFourGamers()
-	listPlayers(gamers)
 }
 
 // helper

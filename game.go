@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const noPlayersErr = "no players to play the game"
+const noPlayersErr = "no players found"
 
 func playGame(playerNames []string, totalDice int) (winner player, error error) {
 	if len(playerNames) == 0 {
@@ -22,7 +22,7 @@ func playGame(playerNames []string, totalDice int) (winner player, error error) 
 		unsortedGamers = append(unsortedGamers, p)
 	}
 
-	gamers, err := randomizePlayers(unsortedGamers)
+	gamers, err := randomTurnOrder(unsortedGamers)
 	sortPlayers(gamers)
 	if err != nil {
 		return
@@ -53,9 +53,9 @@ func playGame(playerNames []string, totalDice int) (winner player, error error) 
 	return
 }
 
-func randomizePlayers(gamers []player) (sortedGamers []player, err error) {
+func randomTurnOrder(gamers []player) (sortedGamers []player, err error) {
 	if len(gamers) == 0 {
-		err = errors.New("no gamers to sort")
+		err = errors.New(noPlayersErr)
 		return
 	}
 	rand.Seed(time.Now().UnixNano())
@@ -110,7 +110,7 @@ func getWinners(gamers []player) (winners []player) {
 func announceWinners(winners []player) error {
 	numWinners := len(winners)
 	winPlural := ""
-	separator := ","
+	oxfordComma := ","
 	and := ""
 	if numWinners == 0 {
 		err := errors.New("nobody won the game")
@@ -120,7 +120,7 @@ func announceWinners(winners []player) error {
 		winPlural = "s"
 	}
 	if numWinners <= 2 {
-		separator = ""
+		oxfordComma = ""
 	}
 	if numWinners > 1 {
 		and = "and "
@@ -128,10 +128,10 @@ func announceWinners(winners []player) error {
 	last := numWinners - 1
 	for i, winner := range winners {
 		if i != last {
-			fmt.Printf("%s%s ", winner.name, separator)
+			fmt.Printf("%s%s ", winner.name, oxfordComma)
 		} else {
-			separator = ""
-			fmt.Printf("%s%s%s ", and, winner.name, separator)
+			oxfordComma = ""
+			fmt.Printf("%s%s%s ", and, winner.name, oxfordComma)
 		}
 	}
 	fmt.Printf("win%s with a final score of %d!\n", winPlural, winners[0].score)

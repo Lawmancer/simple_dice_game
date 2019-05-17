@@ -2,6 +2,7 @@ package main
 
 import "testing"
 
+// integration - ensure no panic
 func TestTakeTurnNoPanic(t *testing.T) {
 	gamer := getPlayer()
 	totalDice := 7
