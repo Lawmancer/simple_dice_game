@@ -8,9 +8,11 @@ import (
 	"time"
 )
 
+const noPlayersErr = "no players to play the game"
+
 func playGame(playerNames []string, totalDice int) (winner player, error error) {
 	if len(playerNames) == 0 {
-		error = errors.New("no players to play the game")
+		error = errors.New(noPlayersErr)
 		return
 	}
 	var unsortedGamers []player

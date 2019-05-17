@@ -6,16 +6,18 @@ import (
 
 func TestPlayGameReturnsPlayer(t *testing.T) {
 	playerNames := []string{"Freddie Mercury", "Brian May", "Roger Taylor", "John Deacon "}
-	_, err := playGame(playerNames)
+	totalDice := 4
+	_, err := playGame(playerNames, totalDice)
 	if err != nil {
 		t.Errorf("Received unexpected error during play: %v", err)
 	}
 }
 
 func TestMainErrWithoutNames(t *testing.T) {
-	expect := "no players to play the game"
+	expect := noPlayersErr
+	totalDice := 6
 	var playerNames []string
-	_, err := playGame(playerNames)
+	_, err := playGame(playerNames, totalDice)
 	if err == nil {
 		t.Error("Did not receive expected error:")
 	} else if err.Error() != expect {
@@ -72,9 +74,9 @@ func TestListPlayersDoesNotPanic(t *testing.T) {
 
 // helper
 func getFourGamers() []player {
-	playerNames := []string{"Freddie Mercury", "Brian May", "Roger Taylor", "John Deacon "}
+	queen := []string{"Freddie Mercury", "Brian May", "Roger Taylor", "John Deacon"}
 	var gamers []player
-	for i, name := range playerNames {
+	for i, name := range queen {
 		gamer := player{
 			name,
 			0,

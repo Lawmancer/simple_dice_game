@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const noDiceErr = "no dice provided"
+
 type player struct {
 	name      string
 	turnOrder int
@@ -15,7 +17,7 @@ type player struct {
 
 func (p *player) takeTurn(numDice int) error {
 	if numDice == 0 {
-		return errors.New("no dice to take turn with")
+		return errors.New(noDiceErr)
 	}
 
 	fmt.Printf("\n%s is taking their turn.\n", p.name)
@@ -49,7 +51,7 @@ func (p *player) roll(d int) []int {
 
 func (p *player) choose(dice []int) (choices []int, err error) {
 	if len(dice) == 0 {
-		err = errors.New("no dice to make choice with")
+		err = errors.New(noDiceErr)
 		return
 	}
 

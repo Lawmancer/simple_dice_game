@@ -4,6 +4,7 @@ import "testing"
 
 func TestTakeTurnNoPanic(t *testing.T) {
 	gamer := getPlayer()
+	totalDice := 7
 	err := gamer.takeTurn(totalDice)
 	if err != nil {
 		t.Errorf("Unexpected error while taking turn.")
@@ -11,7 +12,7 @@ func TestTakeTurnNoPanic(t *testing.T) {
 }
 
 func TestTakeTurnErrWithNoDice(t *testing.T) {
-	expect := "no dice to take turn with"
+	expect := noDiceErr
 	gamer := getPlayer()
 	err := gamer.takeTurn(0)
 	if err == nil {
@@ -44,7 +45,7 @@ func TestChooseReturnsCorrectChoices(t *testing.T) {
 }
 
 func TestChooseErrWithNoDice(t *testing.T) {
-	expect := "no dice to make choice with"
+	expect := noDiceErr
 	gamer := getPlayer()
 	var empty []int
 	_, err := gamer.choose(empty)
@@ -63,8 +64,8 @@ func TestTotalChoicesDoesCorrectMath(t *testing.T) {
 		expect int
 	}{
 		{[]int{1, 2, 3, 4, 5, 6}, 17}, // 4 is 0
-
 		{[]int{3, 5, 6}, 14},
+		{[]int{6, 5, 3}, 14},
 		{[]int{}, 0},
 	}
 	for _, table := range testTables {
@@ -73,12 +74,6 @@ func TestTotalChoicesDoesCorrectMath(t *testing.T) {
 			t.Errorf("Did not total correctly. Wanted %v and Got %v", table.expect, res)
 		}
 	}
-}
-
-func TestReportRollsDoesNotPanic(t *testing.T) {
-	gamer := getPlayer()
-	dice := []int{1, 2, 4}
-	gamer.reportRolls(dice)
 }
 
 // helper
