@@ -25,6 +25,7 @@ func TestMainErrWithoutNames(t *testing.T) {
 	}
 }
 
+// no real way to test random order, but at least ensure get everyone back
 func TestRandomFirstPlayerReturnsFour(t *testing.T) {
 	expect := 4
 	gamers := getFourGamers()
@@ -47,23 +48,54 @@ func TestRandomFirstPlayerErrWithZeroGamers(t *testing.T) {
 	}
 }
 
-func TestSortPlayersReturnsFour(t *testing.T) {
+func TestSortPlayersReturnsCorrectOrder(t *testing.T) {
 	expect := 4
 	gamers := getFourGamers()
+	for i := 3; i >= 0; i-- {
+		gamers[i].turnOrder = (i-4)*-1
+	}
 	res := sortPlayers(gamers)
 	if len(res) != expect {
 		t.Errorf("Did not received expected number of players back. Expected %v, got %v", expect, len(res))
 	}
+	if gamers[0].name != "John Deacon" {
+		t.Errorf("Expected John Deacon to be first")
+	}
+	if gamers[1].name != "Roger Taylor" {
+		t.Errorf("Expected Roger Taylor to be second")
+	}
+	if gamers[2].name != "Brian May" {
+		t.Errorf("Expected Brian May to be third")
+	}
+	if gamers[3].name != "Freddie Mercury" {
+		t.Errorf("Expected Freddie Mercury to be last")
+	}
+
 }
 
-func TestGetWinnerFirst(t *testing.T) {
+func TestGetWinnersReturnsOne(t *testing.T) {
 	gamers := getFourGamers()
-	sortedGamers := sortPlayers(gamers)
-	if len(sortedGamers) != 4 {
+	winners := getWinners(gamers)
+	if len(winners) != 1 {
+		t.Errorf("Did not received one winner")
+	}
+	if winners[0].name != "Freddie Mercury" {
+		t.Errorf("Freddie Mercury did not win.")
+	}
+}
+
+func TestGetWinnersReturnsTie(t *testing.T) {
+	gamers := getFourGamers()
+	gamers[2].score = 0
+	winners := getWinners(gamers)
+	if len(winners) != 2 {
 		t.Errorf("Did not received four players back")
 	}
-	if sortedGamers[0].name != "Freddie Mercury" {
-		t.Errorf("Freddie Mercury did not win.")
+	if winners[0].name != "Freddie Mercury" {
+		t.Errorf("Freddie Mercury did not tie for win.")
+	}
+	if winners[1].name != "Roger Taylor" {
+		t.Errorf("Roger Taylor did not tie for win.")
 	}
 }
 
